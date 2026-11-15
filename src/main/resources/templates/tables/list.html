@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('席の一覧')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1>席の一覧</h1>
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <div class="seats">
+        <div class="seat" th:each="v : ${tables}" th:classappend="${v.table.empty} ? 'free' : 'busy'">
+            <div class="seat-name" th:text="${v.table.name}">A1</div>
+            <div class="seat-info">
+                <span th:text="${v.table.seats} + '人席'">2人席</span>
+                <span class="badge" th:classappend="${v.table.empty} ? 'badge-ok' : 'badge-ng'"
+                      th:text="${v.table.status.label}">空席</span>
+            </div>
+            <!-- 空席：来店受付 -->
+            <form th:if="${v.table.empty}" th:action="@{/tables/{id}/open(id=${v.table.id})}" method="post" class="seat-form">
+                <input type="number" name="guestCount" min="1" th:max="${v.table.seats}" value="1">
+                <span>名</span>
+                <button type="submit" class="btn">来店受付</button>
+            </form>
+            <!-- 利用中：注文画面へ -->
+            <a th:unless="${v.table.empty}" class="btn btn-sub" th:href="@{/orders/{id}(id=${v.orderId})}">注文画面へ</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

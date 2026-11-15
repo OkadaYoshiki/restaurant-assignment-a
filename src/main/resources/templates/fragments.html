@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 各画面で共通して使う部品（フラグメント） -->
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <title th:text="${title} + ' | 注文管理'">注文管理</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:fragment="header">
+    <a class="logo" th:href="@{/}">🍽 注文管理</a>
+    <nav>
+        <a th:href="@{/tables}">席</a>
+        <a th:href="@{/kitchen}">キッチン</a>
+        <a th:href="@{/menu}">メニュー</a>
+        <a th:href="@{/sales}">売上</a>
+    </nav>
+</header>
+
+<div th:fragment="messages">
+    <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
+    <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+</div>
+
+</body>
+</html>

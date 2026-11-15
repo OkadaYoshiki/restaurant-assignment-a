@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('会計')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1 th:text="${order.diningTable.name} + 'の会計'">A1の会計</h1>
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <div class="card receipt">
+        <table>
+            <thead>
+            <tr><th>メニュー</th><th class="num">単価</th><th class="num">数量</th><th class="num">金額</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="i : ${items}">
+                <td th:text="${i.menuItem.name}">ハンバーグ定食</td>
+                <td class="num" th:text="${#numbers.formatInteger(i.unitPrice, 1, 'COMMA')} + '円'">980円</td>
+                <td class="num" th:text="${i.quantity}">1</td>
+                <td class="num" th:text="${#numbers.formatInteger(i.amount, 1, 'COMMA')} + '円'">980円</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 会計済みなら記録された金額、来店中なら今の明細から計算した金額を表示 -->
+        <dl class="sum">
+            <dt>小計（税抜）</dt><dd th:text="${#numbers.formatInteger(order.open ? subtotal : order.subtotal, 1, 'COMMA')} + '円'">0円</dd>
+            <dt>消費税（10%）</dt><dd th:text="${#numbers.formatInteger(order.open ? tax : order.tax, 1, 'COMMA')} + '円'">0円</dd>
+            <dt class="total">合計（税込）</dt><dd class="total" th:text="${#numbers.formatInteger(order.open ? total : order.total, 1, 'COMMA')} + '円'">0円</dd>
+        </dl>
+        <p class="sub-info" th:unless="${order.open}" th:text="'会計日時：' + ${#temporals.format(order.paidAt, 'yyyy/MM/dd HH:mm')}"></p>
+    </div>
+
+    <div class="toolbar">
+        <a class="btn btn-sub" th:href="@{/orders/{id}(id=${order.id})}">注文画面へ戻る</a>
+        <form th:if="${order.open}" th:action="@{/orders/{id}/checkout(id=${order.id})}" method="post"
+              onsubmit="return confirm('会計を確定してよろしいですか？');">
+            <button type="submit" class="btn">会計を確定する</button>
+        </form>
+        <a th:unless="${order.open}" class="btn" th:href="@{/tables}">席の一覧へ</a>
+    </div>
+</main>
+</body>
+</html>

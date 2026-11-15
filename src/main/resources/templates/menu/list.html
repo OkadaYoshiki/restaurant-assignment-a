@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('メニュー一覧')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1>メニュー一覧</h1>
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <div class="toolbar">
+        <!-- 機能①：種類で絞り込み -->
+        <div class="tabs">
+            <a th:href="@{/menu}" th:classappend="${selected == null} ? 'active'">すべて</a>
+            <a th:each="c : ${categories}" th:href="@{/menu(category=${c})}"
+               th:classappend="${selected == c} ? 'active'" th:text="${c.label}">メイン</a>
+        </div>
+        <a class="btn" th:href="@{/menu/new}">＋ メニュー登録</a>
+    </div>
+
+    <p th:if="${#lists.isEmpty(items)}">該当するメニューはありません。</p>
+
+    <table th:unless="${#lists.isEmpty(items)}">
+        <thead>
+        <tr><th>ID</th><th>メニュー名</th><th>種類</th><th class="num">価格（税抜）</th><th>状態</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${items}" th:classappend="${!m.available} ? 'soldout'">
+            <td th:text="${m.id}">1</td>
+            <td th:text="${m.name}">ハンバーグ定食</td>
+            <td th:text="${m.category.label}">メイン</td>
+            <td class="num" th:text="${#numbers.formatInteger(m.price, 1, 'COMMA')} + '円'">980円</td>
+            <td>
+                <span class="badge" th:classappend="${m.available} ? 'badge-ok' : 'badge-ng'"
+                      th:text="${m.available} ? '販売中' : '品切れ'">販売中</span>
+            </td>
+            <td>
+                <a class="btn btn-sub" th:href="@{/menu/{id}/edit(id=${m.id})}">編集</a>
+                <!-- TODO 課題A-2：品切れの切り替えボタンを追加する
+                     ・/menu/{id}/toggle へ POST で送るフォーム（class="inline"）
+                     ・販売中なら「品切れにする」（class="btn btn-danger"）、品切れなら「販売再開」（class="btn"）と表示する
+                     ・ヒント：th:text と th:classappend で、m.available によって表示を切り替える -->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

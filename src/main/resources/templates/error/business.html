@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('エラー')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1>エラー</h1>
+    <div class="alert alert-error" th:text="${errorMessage}">エラーメッセージ</div>
+    <a class="btn btn-sub" th:href="@{/}">トップへ戻る</a>
+</main>
+</body>
+</html>

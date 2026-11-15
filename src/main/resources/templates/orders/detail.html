@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('注文')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1 th:text="${order.diningTable.name} + 'の注文'">A1の注文</h1>
+    <div th:replace="~{fragments :: messages}"></div>
+
+    <p class="sub-info">
+        <span th:text="${order.guestCount} + '名'">2名</span>
+        ／ 来店 <span th:text="${#temporals.format(order.openedAt, 'HH:mm')}">18:00</span>
+        ／ <span class="badge" th:classappend="${order.open} ? 'badge-ng' : 'badge-ok'" th:text="${order.status.label}">来店中</span>
+    </p>
+
+    <!-- 機能⑥：注文の追加（来店中のときだけ表示） -->
+    <div class="card" th:if="${order.open}">
+        <form th:action="@{/orders/{id}/items(id=${order.id})}" th:object="${orderItemForm}" method="post" class="row-form">
+            <div class="field">
+                <label for="menuItemId">メニュー</label>
+                <select id="menuItemId" th:field="*{menuItemId}">
+                    <option value="">-- 選択してください --</option>
+                    <option th:each="m : ${menus}" th:value="${m.id}"
+                            th:text="'[' + ${m.category.label} + '] ' + ${m.name} + '（' + ${#numbers.formatInteger(m.price, 1, 'COMMA')} + '円）'">メニュー</option>
+                </select>
+                <div class="error" th:if="${#fields.hasErrors('menuItemId')}" th:errors="*{menuItemId}"></div>
+            </div>
+            <div class="field qty">
+                <label for="quantity">数量</label>
+                <input type="number" id="quantity" th:field="*{quantity}" min="1" max="10">
+                <div class="error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></div>
+            </div>
+            <button type="submit" class="btn">注文する</button>
+        </form>
+    </div>
+
+    <p th:if="${#lists.isEmpty(items)}">まだ注文はありません。</p>
+
+    <table th:unless="${#lists.isEmpty(items)}">
+        <thead>
+        <tr><th>注文時刻</th><th>メニュー</th><th class="num">単価</th><th class="num">数量</th><th class="num">金額</th><th>状態</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${items}">
+            <td th:text="${#temporals.format(i.orderedAt, 'HH:mm')}">18:05</td>
+            <td th:text="${i.menuItem.name}">ハンバーグ定食</td>
+            <td class="num" th:text="${#numbers.formatInteger(i.unitPrice, 1, 'COMMA')} + '円'">980円</td>
+            <td class="num" th:text="${i.quantity}">1</td>
+            <td class="num" th:text="${#numbers.formatInteger(i.amount, 1, 'COMMA')} + '円'">980円</td>
+            <td><span class="badge" th:classappend="${i.served} ? 'badge-ok' : 'badge-ng'" th:text="${i.status.label}">注文済</span></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr><th colspan="4" class="num">小計（税抜）</th><td class="num" th:text="${#numbers.formatInteger(subtotal, 1, 'COMMA')} + '円'">0円</td><td></td></tr>
+        </tfoot>
+    </table>
+
+    <div class="toolbar">
+        <a class="btn btn-sub" th:href="@{/tables}">席の一覧へ</a>
+        <a class="btn" th:if="${order.open}" th:href="@{/orders/{id}/checkout(id=${order.id})}">会計へ進む</a>
+    </div>
+</main>
+</body>
+</html>

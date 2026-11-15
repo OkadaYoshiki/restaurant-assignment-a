@@ -1,0 +1,23 @@
+# MySQL を Docker で起動する設定
+#   起動: docker compose up -d
+#   停止: docker compose down
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: restaurant-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: restaurant
+      MYSQL_USER: restaurant
+      MYSQL_PASSWORD: restaurant
+      TZ: Asia/Tokyo
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - restaurant-mysql-data:/var/lib/mysql
+      # 初回起動時に sql/ の中のSQL（テーブル作成・初期データ）を自動で実行する
+      - ./sql:/docker-entrypoint-initdb.d
+
+volumes:
+  restaurant-mysql-data:
