@@ -14,6 +14,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     // TODO 課題A-1：指定した種類（category）のメニューを、ID順で取得するメソッドを追加する
     //   ヒント：すぐ上の findAllByOrderByIdAsc と、名前のつけ方を見比べてみよう
 
-    /** 販売中（品切れでない）のメニューを種類・ID順で取得 */
-    List<MenuItem> findByAvailableTrueOrderByCategoryAscIdAsc();
+    /** 販売中（品切れでない）のメニューをID順で取得 */
+    List<MenuItem> findByAvailableTrueOrderByIdAsc();
 }

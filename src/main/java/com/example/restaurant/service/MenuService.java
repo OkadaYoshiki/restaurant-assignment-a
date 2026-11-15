@@ -1,5 +1,6 @@
 package com.example.restaurant.service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -34,9 +35,16 @@ public class MenuService {
         return findAll();
     }
 
-    /** 販売中のメニュー（注文画面の選択肢） */
+    /**
+     * 販売中のメニュー（注文画面の選択肢）
+     * 種類（メイン → サイド → ドリンク → デザート）の順に並べる。
+     * DB の category 列は文字列なので、ORDER BY だとアルファベット順（DESSERT が先頭）になってしまう。
+     * そのため、enum の宣言順で Java 側で並べ替えている
+     */
     public List<MenuItem> findAvailable() {
-        return menuItemRepository.findByAvailableTrueOrderByCategoryAscIdAsc();
+        return menuItemRepository.findByAvailableTrueOrderByIdAsc().stream()
+                .sorted(Comparator.comparing(MenuItem::getCategory))
+                .toList();
     }
 
     public MenuItem findById(Long id) {
